@@ -31,6 +31,15 @@ def wireless_quality(pep):
 				SSID = value.split (":")
 				msg.SSID = SSID[1]
 
+			# if "Mode" in value :
+			# 	mode = value.split (":")
+			# 	msg.mode = mode[1]
+
+			if "Access Point" in value :
+				access_point = value.split (":")
+				msg.access_point = access_point[1]
+				# msg.access_point = access_point
+
 			if "Frequency" in value :
 				frequency = value.split (":")
 				frequency = frequency[1]
@@ -49,6 +58,10 @@ def wireless_quality(pep):
 				tx_power = tx_power.split (" ")
 				msg.tx_power = float(tx_power[0])
 
+			if "Sensitivity" in value :
+				sensitivity = value.split (":")
+				msg.sensitivity = sensitivity[1]
+
 			if "Link Quality" in value :
 				link_quality = value.split ("=")
 				msg.link_quality = link_quality[1]
@@ -64,6 +77,30 @@ def wireless_quality(pep):
 				noise_level = noise_level[1]
 				noise_level = noise_level.split (" ")
 				msg.noise_level = int(noise_level[0])
+
+			if "Rx invalid nwid" in value :
+				rx_invalid_nwid = value.split (":")
+				msg.rx_invalid_nwid = int(rx_invalid_nwid[1])
+
+			if "Rx invalid crypt" in value :
+				rx_invalid_crypt = value.split (":")
+				msg.rx_invalid_crypt = int(rx_invalid_crypt[1])
+
+			if "Rx invalid frag" in value :
+				rx_invalid_frag = value.split (":")
+				msg.rx_invalid_frag = int(rx_invalid_frag[1])
+
+			if "Tx excessive retries" in value :
+				tx_excessive_retries = value.split (":")
+				msg.tx_excessive_retries = int(tx_excessive_retries[1])
+
+			if "Invalid misc" in value :
+				invalid_misc = value.split (":")
+				msg.invalid_misc = int(invalid_misc[1])
+
+			if "Missed beacons" in value :
+				missed_beacons = value.split (":")
+				msg.missed_beacons = int(missed_beacons[1])
 
 	  	pub_wireles_info.publish(msg)
     		rate.sleep()
