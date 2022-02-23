@@ -2,8 +2,11 @@
 import os
 import rospy
 import std_msgs.msg
+import message_filters
 from link_quality.msg import  AcousticLink
 from evologics_ros_sync.msg import EvologicsChannelDiagnostics,EvologicsUsbllong
+from cola2_msgs.msg import NavSts
+from math import *
 
 class AcousticQuality():
 
@@ -18,6 +21,14 @@ class AcousticQuality():
                         EvologicsUsbllong,    
                         self.update_evologics_usbllong,
                         queue_size=1)
+
+        turbot_position = message_filters.Subscriber("/turbot/navigator/navigation",NavSts)
+        xiroi_position = message_filters.Subscriber("/xiroi/navigator/navigation",NavSts)
+
+        # Topic synchronization
+        ts =  message_filters.ApproximateTimeSynchronizer([turbot_position, xiroi_position], 1, 1)
+
+        ts.registerCallback(self.position_callback)
 
         #Publishers
         self.acoustic_message_pub = rospy.Publisher("network_analysis/acoustic_quality",
@@ -38,9 +49,15 @@ class AcousticQuality():
         self.msg.rssi_usbl = usbllong_msg.rssi
         self.msg.integrity_usbl = usbllong_msg.integrity
         self.msg.accuracy_usbl = usbllong_msg.accuracy
+    
+    def position_callback(self,xiroi_p,turbot_p):
+        self.x_distance = turbot_p.position.north-xiroi_p.position.north
+        self.y_distance = turbot_p.position.east-xiroi_p.position.east
+        self.distance = sqrt((self.x_distance)**2 + (self.y_distance)**2)
+        self.msg.distance = self.distance
+
 
     def message_publisher(self,event):
-
         self.msg.header.stamp = rospy.Time.now()
         self.acoustic_message_pub.publish(self.msg)
 
