@@ -31,9 +31,9 @@ def wireless_quality(pep):
 				SSID = value.split (":")
 				msg.SSID = SSID[1]
 
-			# if "Mode" in value :
-			# 	mode = value.split (":")
-			# 	msg.mode = mode[1]
+			if "Mode" in value :
+				mode = value.split (":")
+				msg.mode = mode[1]
 
 			if "Access Point" in value :
 				access_point = value.split (":")
