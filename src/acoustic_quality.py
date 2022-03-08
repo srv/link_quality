@@ -11,23 +11,25 @@ from math import *
 class AcousticQuality():
 
     def __init__(self,name):
-        #Subscribers
+        # Subscribers
         rospy.Subscriber("/turbot/evologics_channel",
                         EvologicsChannelDiagnostics,    
-                        self.update_evologics_channel,
+                        self.update_turbot_evologics_channel,
                         queue_size=1)
-
-        rospy.Subscriber("/xiroi/usbllong",
-                        EvologicsUsbllong,    
-                        self.update_evologics_usbllong,
+        
+        rospy.Subscriber("/xiroi/evologics_channel",
+                        EvologicsChannelDiagnostics,    
+                        self.update_xiroi_evologics_channel,
                         queue_size=1)
 
         turbot_position = message_filters.Subscriber("/turbot/navigator/navigation",NavSts)
+        turbot_position_acoustic = message_filters.Subscriber("/turbot/navigator/navigation_throttle_acoustic",NavSts)
         xiroi_position = message_filters.Subscriber("/xiroi/navigator/navigation",NavSts)
 
         # Topic synchronization
         ts =  message_filters.ApproximateTimeSynchronizer([turbot_position, xiroi_position], 1, 1)
-
+        ts =  message_filters.ApproximateTimeSynchronizer([turbot_position_acoustic, xiroi_position], 1, 1)
+        
         ts.registerCallback(self.position_callback)
 
         #Publishers
@@ -38,30 +40,35 @@ class AcousticQuality():
         # Init periodic timer
         rospy.Timer(rospy.Duration(1.0), self.message_publisher)
         self.msg = AcousticLink()
-                        
-
-    def update_evologics_channel(self,chanel_msg):
+    
+    def acoustic_link_info_callback(self,usbl_msg, modem_msg):
+        self.msg.rssi_modem = modem_msg.rssi
+        self.msg.integrity_modem = modem_msg.integrity
+        self.msg.rssi_usbl = usbl_msg.rssi
+        self.msg.integrity_usbl = usbl_msg.integrity
+        self.acoustic_channel_info = True 
+                  
+    def update_turbot_evologics_channel(self,chanel_msg):
         self.msg.rssi_modem = chanel_msg.rssi
         self.msg.integrity_modem = chanel_msg.integrity
-
-
-    def update_evologics_usbllong(self,usbllong_msg):
-        self.msg.rssi_usbl = usbllong_msg.rssi
-        self.msg.integrity_usbl = usbllong_msg.integrity
-        self.msg.accuracy_usbl = usbllong_msg.accuracy
     
+    def update_xiroi_evologics_channel(self,chanel_msg):
+        self.msg.rssi_usbl = chanel_msg.rssi
+        self.msg.integrity_usbl = chanel_msg.integrity
+  
     def position_callback(self,xiroi_p,turbot_p):
         self.x_distance = turbot_p.position.north-xiroi_p.position.north
         self.y_distance = turbot_p.position.east-xiroi_p.position.east
         self.distance = sqrt((self.x_distance)**2 + (self.y_distance)**2)
         self.msg.distance = self.distance
+        self.position_info = True
+        self.message_publisher
 
 
     def message_publisher(self,event):
         self.msg.header.stamp = rospy.Time.now()
         self.acoustic_message_pub.publish(self.msg)
-
-
+ 
 if __name__ == '__main__':
 
 	try:
