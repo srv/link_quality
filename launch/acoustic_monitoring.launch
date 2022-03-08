@@ -1,0 +1,12 @@
+<launch>
+    <!-- Params -->
+    <arg name="robot_name" default="xiroi"/>
+
+    <!-- Flags -->
+    <arg name="enableAcousticLinkMonitoring" default="true"/>
+
+    <!-- WIRELESS LINK MONITORING -->
+    <group if="$(arg enableAcousticLinkMonitoring)">
+        <node name="acoustic_quality" pkg="link_quality" type="acoustic_quality.py" output="screen"/> 
+    </group>
+</launch>
