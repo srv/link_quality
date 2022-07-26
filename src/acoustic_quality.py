@@ -27,10 +27,11 @@ class AcousticQuality():
         xiroi_position = message_filters.Subscriber("/xiroi/navigator/navigation",NavSts)
 
         # Topic synchronization
-        ts =  message_filters.ApproximateTimeSynchronizer([turbot_position, xiroi_position], 1, 1)
-        ts =  message_filters.ApproximateTimeSynchronizer([turbot_position_acoustic, xiroi_position], 1, 1)
+        ts =  message_filters.ApproximateTimeSynchronizer([turbot_position, xiroi_position], 10, 10)
+        ts1 =  message_filters.ApproximateTimeSynchronizer([turbot_position_acoustic, xiroi_position], 10, 10)
         
         ts.registerCallback(self.position_callback)
+        ts1.registerCallback(self.position_callback)
 
         #Publishers
         self.acoustic_message_pub = rospy.Publisher("network_analysis/acoustic_quality",
@@ -38,7 +39,7 @@ class AcousticQuality():
                                                 queue_size=1)
 
         # Init periodic timer
-        rospy.Timer(rospy.Duration(1.0), self.message_publisher)
+        # rospy.Timer(rospy.Duration(1.0), self.message_publisher)
         self.msg = AcousticLink()
     
     def acoustic_link_info_callback(self,usbl_msg, modem_msg):
@@ -57,15 +58,12 @@ class AcousticQuality():
         self.msg.integrity_usbl = chanel_msg.integrity
   
     def position_callback(self,xiroi_p,turbot_p):
+        print("IM IIIIIIN")
         self.x_distance = turbot_p.position.north-xiroi_p.position.north
         self.y_distance = turbot_p.position.east-xiroi_p.position.east
         self.distance = sqrt((self.x_distance)**2 + (self.y_distance)**2)
         self.msg.distance = self.distance
         self.position_info = True
-        self.message_publisher
-
-
-    def message_publisher(self,event):
         self.msg.header.stamp = rospy.Time.now()
         self.acoustic_message_pub.publish(self.msg)
  
