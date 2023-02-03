@@ -58,7 +58,6 @@ class AcousticQuality():
         self.msg.integrity_usbl = chanel_msg.integrity
   
     def position_callback(self,xiroi_p,turbot_p):
-        print("IM IIIIIIN")
         self.x_distance = turbot_p.position.north-xiroi_p.position.north
         self.y_distance = turbot_p.position.east-xiroi_p.position.east
         self.distance = sqrt((self.x_distance)**2 + (self.y_distance)**2)
