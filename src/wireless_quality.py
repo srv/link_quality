@@ -24,6 +24,9 @@ def wireless_quality(pep):
 	while not rospy.is_shutdown():
 		msg.header.stamp = rospy.Time.now()
 		values = get_info_from_device()
+		# print("-----------------------------------------")
+		# print(values)
+		# print(type(values))
 
 		for value in values:
 
@@ -47,7 +50,7 @@ def wireless_quality(pep):
 				msg.frequency = float(frequency[0])
 
 			if "Bit Rate" in value :
-				bitrate = value.split (":")
+				bitrate = value.split ("=")
 				bitrate = bitrate[1]
 				bitrate = bitrate.split (" ")
 				msg.bitrate = float(bitrate[0])

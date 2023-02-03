@@ -1,13 +1,16 @@
 <launch>
     <!-- Params -->
     <arg name="host_name" default="192.168.1.227"/>
+    <!-- Flags -->
+    <arg name="enableWirelessLinkMonitoring" default="true"/>
 
     <!-- WIRELESS LINK MONITORING -->
-   
-    <node name="wireless_quality" pkg="link_quality" type="wireless_quality.py" output="screen"> 
-        <param name="host_name" value="$(arg host_name)"/>
-        <param name="username" value="ubnt"/>
-        <param name="password" value="underwaterpass"/>
-    </node> 
-
+    <group if="$(arg enableWirelessLinkMonitoring)">
+        <node name="wireless_quality" pkg="link_quality" type="wireless_quality.py" output="screen"> 
+            <param name="host_name" value="$(arg host_name)"/>
+            <param name="username" value="ubnt"/>
+            <param name="password" value="underwaterpass"/>
+        </node> 
+    </group>
 </launch>
+
