@@ -1,6 +1,6 @@
 <launch>
     <!-- Params -->
-    <arg name="host_name" default="192.168.1.227"/>
+    <arg name="host_name" default="172.28.5.227"/>
     <!-- Flags -->
     <arg name="enableWirelessLinkMonitoring" default="true"/>
 
